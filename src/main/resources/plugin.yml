@@ -1,0 +1,7 @@
+name: EnchantmentDisabler
+author: opd02
+version: '${project.version}'
+main: me.opd.enchantmentdisabler.EnchantmentDisablerPlugin
+api-version: '1.20'
+commands:
+  ed:
