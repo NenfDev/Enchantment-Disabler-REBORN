@@ -8,7 +8,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+import static org.bukkit.enchantments.Enchantment.*;
 
 public class PrepareItemEnchantListener implements Listener {
 
@@ -50,9 +55,12 @@ public class PrepareItemEnchantListener implements Listener {
     }
 
     public Enchantment newChosenEnchantment(ItemStack item){
+        Enchantment[] notTable = new Enchantment[]{VANISHING_CURSE,BINDING_CURSE,FROST_WALKER,MENDING,SOUL_SPEED,SWIFT_SNEAK};
+        List notPossibleFromTable = Arrays.asList(notTable);
+
         Random rand = new Random();
         int chosen = rand.nextInt(EnchantmentDisablerPlugin.allowedEnchant.size());
-        if(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item)){
+        if(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item)||notPossibleFromTable.contains(chosen)){
             return EnchantmentDisablerPlugin.allowedEnchant.get(chosen);
         }else{
             return newChosenEnchantment(item);
