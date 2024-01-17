@@ -8,7 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -17,53 +16,40 @@ import static org.bukkit.enchantments.Enchantment.*;
 
 public class PrepareItemEnchantListener implements Listener {
 
+//TODO Need to make so that they can't re roll enchants by spamming the item
+    //TODO Need to make sure they are accurate for the level being applied to them
     @EventHandler
     public void onPlayerPrepEnchant(PrepareItemEnchantEvent e){
-        //Bukkit.getServer().broadcastMessage("Prep");
-
-        //	Player p = e.getEnchanter();
-        //ArrayList<Enchantment> allowed = new ArrayList<Enchantment>();
-
-//        for(Enchantment en : EnchantmentDisablerPlugin.blockedEnchants.keySet()){
-//            if(EnchantmentDisablerPlugin.blockedEnchants.get(en) == false && en.canEnchantItem(e.getItem())){
-//                allowed.add(en);
-//                e.getEnchanter().sendMessage(ChatColor.GOLD + en.toString());
-//            }
-//        }
-        //e.getEnchanter().sendMessage(ChatColor.DARK_PURPLE + "" + EnchantmentDisablerPlugin.allowedEnchant.size() + " possible enchants");
-       // e.getEnchanter().sendMessage(ChatColor.AQUA + "" + EnchantmentDisablerPlugin.blockedEnchants.size() + " size of blocked list");
-
         for(EnchantmentOffer eo : e.getOffers()){
             if(eo == null){
                 continue;
             }
             if(EnchantmentDisablerPlugin.blockedEnchants.get(eo.getEnchantment()) == true){
-               // e.getEnchanter().sendMessage(ChatColor.RED + String.valueOf(EnchantmentDisablerPlugin.allowedEnchant.size()));
-                //e.getEnchanter().sendMessage(String.valueOf(chosen));
-                //p.sendMessage(ChatColor.RED + allowed.get(chosen).toString());
+                eo.setEnchantment(newChosenEnchantment(e.getItem(),(long)e.getEnchanter().getExp()));
 
-                //e.getEnchanter().sendMessage("The enchantment " + eo.getEnchantment().toString() + " was blocked and replaced with " + EnchantmentDisablerPlugin.allowedEnchant.get(chosen).toString());
-                eo.setEnchantment(newChosenEnchantment(e.getItem()));
-                eo.setEnchantmentLevel((int)(newChosenEnchantment(e.getItem()).getMaxLevel()/2)+1);
+                //When setting the level, do something like this...
+                int cost = ((eo.getCost()/30)*eo.getEnchantment().getMaxLevel());
+                //Will have to make sure rounding and edge cases work
+
+                eo.setEnchantmentLevel((int)(newChosenEnchantment(e.getItem(),Long.decode(eo.toString())).getMaxLevel()/2)+1);
                 e.getEnchanter().updateInventory();
-
             }
-
-            //eo.setEnchantment(Enchantment.ARROW_DAMAGE);
-            //p.sendMessage("That enchantment is blocked!");
         }
     }
 
-    public Enchantment newChosenEnchantment(ItemStack item){
+    public Enchantment newChosenEnchantment(ItemStack item,long seed){
         Enchantment[] notTable = new Enchantment[]{VANISHING_CURSE,BINDING_CURSE,FROST_WALKER,MENDING,SOUL_SPEED,SWIFT_SNEAK};
         List notPossibleFromTable = Arrays.asList(notTable);
 
         Random rand = new Random();
+        //Use seeded randomness to prevent spammers?
+        rand.setSeed(seed);
+
         int chosen = rand.nextInt(EnchantmentDisablerPlugin.allowedEnchant.size());
         if(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item)||notPossibleFromTable.contains(chosen)){
             return EnchantmentDisablerPlugin.allowedEnchant.get(chosen);
         }else{
-            return newChosenEnchantment(item);
+            return newChosenEnchantment(item,seed);
         }
     }
 }
