@@ -1,8 +1,10 @@
 package me.opd.enchantmentdisabler.listeners;
 
 import me.opd.enchantmentdisabler.EnchantmentDisablerPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
@@ -20,18 +22,23 @@ public class PrepareItemEnchantListener implements Listener {
     //TODO Need to make sure they are accurate for the level being applied to them
     @EventHandler
     public void onPlayerPrepEnchant(PrepareItemEnchantEvent e){
+        Player p = e.getEnchanter();
+        long seed = (long) (p.getHealth() + p.getLocation().getY() + p.getName().length());
         for(EnchantmentOffer eo : e.getOffers()){
             if(eo == null){
                 continue;
             }
             if(EnchantmentDisablerPlugin.blockedEnchants.get(eo.getEnchantment()) == true){
-                eo.setEnchantment(newChosenEnchantment(e.getItem(),(long)e.getEnchanter().getExp()));
-
+                eo.setEnchantment(newChosenEnchantment(e.getItem(),seed));
+                seed = seed +30;
                 //When setting the level, do something like this...
-                int cost = ((eo.getCost()/30)*eo.getEnchantment().getMaxLevel());
+                int enchantLevel = ((eo.getCost()/30)*eo.getEnchantment().getMaxLevel());
                 //Will have to make sure rounding and edge cases work
+                if(enchantLevel<1){
+                    enchantLevel=1;
+                }
 
-                eo.setEnchantmentLevel((int)(newChosenEnchantment(e.getItem(),Long.decode(eo.toString())).getMaxLevel()/2)+1);
+                eo.setEnchantmentLevel(enchantLevel);
                 e.getEnchanter().updateInventory();
             }
         }
@@ -44,12 +51,14 @@ public class PrepareItemEnchantListener implements Listener {
         Random rand = new Random();
         //Use seeded randomness to prevent spammers?
         rand.setSeed(seed);
+        System.out.println("Seed: " + seed);
 
         int chosen = rand.nextInt(EnchantmentDisablerPlugin.allowedEnchant.size());
-        if(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item)||notPossibleFromTable.contains(chosen)){
+        System.out.println(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).toString());
+        if(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item) || !notPossibleFromTable.contains(chosen)){
             return EnchantmentDisablerPlugin.allowedEnchant.get(chosen);
         }else{
-            return newChosenEnchantment(item,seed);
+            return newChosenEnchantment(item, seed+1);
         }
     }
 }
