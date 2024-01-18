@@ -23,16 +23,16 @@ public class PrepareItemEnchantListener implements Listener {
     @EventHandler
     public void onPlayerPrepEnchant(PrepareItemEnchantEvent e){
         Player p = e.getEnchanter();
-        long seed = (long) (p.getHealth() + p.getLocation().getY() + p.getName().length());
+        long seed = (long) p.getLevel() * 3469;
         for(EnchantmentOffer eo : e.getOffers()){
             if(eo == null){
                 continue;
             }
             if(EnchantmentDisablerPlugin.blockedEnchants.get(eo.getEnchantment()) == true){
-                eo.setEnchantment(newChosenEnchantment(e.getItem(),seed));
-                seed = seed +30;
+                eo.setEnchantment(newChosenEnchantment(e.getItem(), seed));
+                //seed = seed + 30;
                 //When setting the level, do something like this...
-                int enchantLevel = ((eo.getCost()/30)*eo.getEnchantment().getMaxLevel());
+                int enchantLevel = ((eo.getCost()/30) * eo.getEnchantment().getMaxLevel());
                 //Will have to make sure rounding and edge cases work
                 if(enchantLevel<1){
                     enchantLevel=1;
@@ -44,7 +44,7 @@ public class PrepareItemEnchantListener implements Listener {
         }
     }
 
-    public Enchantment newChosenEnchantment(ItemStack item,long seed){
+    public Enchantment newChosenEnchantment(ItemStack item, long seed){
         Enchantment[] notTable = new Enchantment[]{VANISHING_CURSE,BINDING_CURSE,FROST_WALKER,MENDING,SOUL_SPEED,SWIFT_SNEAK};
         List notPossibleFromTable = Arrays.asList(notTable);
 
@@ -53,9 +53,9 @@ public class PrepareItemEnchantListener implements Listener {
         rand.setSeed(seed);
         System.out.println("Seed: " + seed);
 
-        int chosen = rand.nextInt(EnchantmentDisablerPlugin.allowedEnchant.size());
+        int chosen = rand.nextInt(EnchantmentDisablerPlugin.allowedEnchant.size() - 1);
         System.out.println(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).toString());
-        if(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item) || !notPossibleFromTable.contains(chosen)){
+        if(EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item) && !notPossibleFromTable.contains(EnchantmentDisablerPlugin.allowedEnchant.get(chosen))){
             return EnchantmentDisablerPlugin.allowedEnchant.get(chosen);
         }else{
             return newChosenEnchantment(item, seed+1);

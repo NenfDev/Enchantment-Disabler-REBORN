@@ -30,7 +30,7 @@ public class EnchantItemListener implements Listener {
 //		p.sendMessage(ChatColor.GOLD + "EVENT CALLED");
 //		p.sendMessage(ChatColor.LIGHT_PURPLE + e.getEnchantsToAdd().keySet().toString());
 
-        ArrayList<Enchantment> toChange = new ArrayList<Enchantment>();
+        ArrayList<Enchantment> toChange = new ArrayList<>();
 
         for(Map.Entry<Enchantment, Integer> entry : e.getEnchantsToAdd().entrySet()){
 
@@ -38,7 +38,7 @@ public class EnchantItemListener implements Listener {
                 continue;
             }
 
-            if(EnchantmentDisablerPlugin.blockedEnchants.get(entry.getKey())==false){
+            if(!EnchantmentDisablerPlugin.blockedEnchants.get(entry.getKey())){
                 continue;
             }
 
@@ -60,7 +60,7 @@ public class EnchantItemListener implements Listener {
             //Line below this is what was there
             e.getEnchantsToAdd().remove(en, e.getEnchantsToAdd().get(en));
             //e.getItem().addEnchantment(e.getEnchantmentHint(),1);
-            e.getEnchantsToAdd().put(e.getEnchantmentHint(),(int)(e.getEnchantmentHint().getMaxLevel()/2)+1);
+            e.getEnchantsToAdd().put(e.getEnchantmentHint(),(e.getEnchantmentHint().getMaxLevel()/2)+1);
             //e.getEnchantsToAdd().put(allowed.get(chosen), (rand.nextInt(allowed.get(chosen).getMaxLevel() + 1)+1));
             //e.getEnchanter().sendMessage(ChatColor.BLUE + "" + allowed.get(chosen) + " at level " + allowed.get(chosen).getMaxLevel());
         }
