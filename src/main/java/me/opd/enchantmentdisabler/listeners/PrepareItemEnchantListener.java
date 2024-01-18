@@ -1,7 +1,6 @@
 package me.opd.enchantmentdisabler.listeners;
 
 import me.opd.enchantmentdisabler.EnchantmentDisablerPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
 import org.bukkit.entity.Player;
@@ -28,7 +27,7 @@ public class PrepareItemEnchantListener implements Listener {
             if(eo == null){
                 continue;
             }
-            if(EnchantmentDisablerPlugin.blockedEnchants.get(eo.getEnchantment()) == true){
+            if(EnchantmentDisablerPlugin.blockedEnchants.get(eo.getEnchantment())){
                 eo.setEnchantment(newChosenEnchantment(e.getItem(), seed));
                 //seed = seed + 30;
                 //When setting the level, do something like this...
@@ -46,7 +45,7 @@ public class PrepareItemEnchantListener implements Listener {
 
     public Enchantment newChosenEnchantment(ItemStack item, long seed){
         Enchantment[] notTable = new Enchantment[]{VANISHING_CURSE,BINDING_CURSE,FROST_WALKER,MENDING,SOUL_SPEED,SWIFT_SNEAK};
-        List notPossibleFromTable = Arrays.asList(notTable);
+        List<Enchantment> notPossibleFromTable = Arrays.asList(notTable);
 
         Random rand = new Random();
         //Use seeded randomness to prevent spammers?
