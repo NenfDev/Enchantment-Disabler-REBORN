@@ -1,6 +1,7 @@
 package me.opd.enchantmentdisabler.listeners;
 
 import me.opd.enchantmentdisabler.EnchantmentDisablerPlugin;
+import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,14 +28,16 @@ public class EnchantItemListener implements Listener {
 
         for(Enchantment en : toChange){
             e.getEnchantsToAdd().remove(en, e.getEnchantsToAdd().get(en));
+            e.getEnchanter().sendMessage(ChatColor.RED + "Removed enchantment " + en.getName());
 
             int enchantLevel = ((e.getExpLevelCost()/30) * (e.getEnchantmentHint().getMaxLevel()));
-            //e.getEnchanter().sendMessage((double)e.getExpLevelCost()/30 + " is the listener level");
-            //e.getEnchanter().sendMessage(en.getMaxLevel() + " is listener max level of " + en.getName());
+            e.getEnchanter().sendMessage(ChatColor.YELLOW + "Hint enchant was " + e.getEnchantmentHint().getName() + " at level " + e.getEnchantmentHint().getMaxLevel());
 
             if(enchantLevel<1 || e.getEnchantmentHint().getMaxLevel() == 1){
                 enchantLevel=1;
-            }else if (enchantLevel > e.getEnchantmentHint().getMaxLevel()){
+            }else if(enchantLevel == e.getEnchantmentHint().getMaxLevel()){
+                enchantLevel = enchantLevel - 1;
+            } else if (enchantLevel > e.getEnchantmentHint().getMaxLevel()){
                 enchantLevel = e.getEnchantmentHint().getMaxLevel();
             }
             e.getEnchantsToAdd().put(e.getEnchantmentHint(), enchantLevel);

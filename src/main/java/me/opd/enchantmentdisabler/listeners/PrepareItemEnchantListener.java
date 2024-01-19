@@ -1,6 +1,7 @@
 package me.opd.enchantmentdisabler.listeners;
 
 import me.opd.enchantmentdisabler.EnchantmentDisablerPlugin;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentOffer;
@@ -20,8 +21,12 @@ public class PrepareItemEnchantListener implements Listener {
 
     @EventHandler
     public void onPlayerPrepEnchant(PrepareItemEnchantEvent e){
+        //TODO I think we are having issues when the hint enchant is not the that was edited
+
         Player p = e.getEnchanter();
         long seed = (long) p.getLevel() * 3469;
+
+        p.sendMessage(ChatColor.GREEN + "The number of offers is " + e.getOffers().length);
 
         for(EnchantmentOffer eo : e.getOffers()){
             if(eo == null){
@@ -42,7 +47,9 @@ public class PrepareItemEnchantListener implements Listener {
 
                 if(enchantLevel<1 || eo.getEnchantment().getMaxLevel() == 1){
                     enchantLevel=1;
-                }else if (enchantLevel > eo.getEnchantment().getMaxLevel()){
+                }else if(enchantLevel == eo.getEnchantment().getMaxLevel()){
+                    enchantLevel = enchantLevel - 1;
+                } else if (enchantLevel > eo.getEnchantment().getMaxLevel()){
                     enchantLevel = eo.getEnchantment().getMaxLevel();
                 }
 
