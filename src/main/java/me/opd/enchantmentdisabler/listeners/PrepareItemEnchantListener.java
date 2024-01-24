@@ -1,6 +1,7 @@
 package me.opd.enchantmentdisabler.listeners;
 
 import me.opd.enchantmentdisabler.EnchantmentDisablerPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -24,55 +25,43 @@ public class PrepareItemEnchantListener implements Listener {
         //TODO I think we are having issues when the hint enchant is not the that was edited
 
         Player p = e.getEnchanter();
-        long seed = (long) p.getLevel() * 3469;
+        final long seed = (long) p.getLevel() * 3469;
 
-        p.sendMessage(ChatColor.GREEN + "The number of offers is " + e.getOffers().length);
+        //p.sendMessage(ChatColor.GREEN + "The number of offers is " + e.getOffers().length);
 
         for(EnchantmentOffer eo : e.getOffers()){
             if(eo == null){
                 continue;
             }
 
-            seed = seed + eo.getCost();
+            long altSeed = seed + eo.getCost();
 
             if(EnchantmentDisablerPlugin.blockedEnchants.get(eo.getEnchantment())){
-                eo.setEnchantment(newChosenEnchantment(e.getItem(), seed,
-                        new Enchantment[]{e.getOffers()[0].getEnchantment(),
-                                e.getOffers()[1].getEnchantment(),
-                        e.getOffers()[2].getEnchantment()}));
+                Enchantment replacementEnchant = EnchantmentDisablerPlugin.enchantUtils.newChosenEnchantment(e.getItem(), altSeed);
+            //e.getEnchanter().sendMessage("Prepare seed: " + altSeed);
 
-                int enchantLevel = ((eo.getCost() /30) * eo.getEnchantment().getMaxLevel());
+                int enchantLevel = ((eo.getCost() /30) * replacementEnchant.getMaxLevel());
                // p.sendMessage((double)eo.getCost()/30 + " is the prepare level");
                 //p.sendMessage(eo.getEnchantment().getMaxLevel() + " is prepare max level of " + eo.getEnchantment().getName());
 
-                if(enchantLevel<1 || eo.getEnchantment().getMaxLevel() == 1){
+                if(enchantLevel<1 || replacementEnchant.getMaxLevel() == 1){
                     enchantLevel=1;
-                }else if(enchantLevel == eo.getEnchantment().getMaxLevel()){
+                }else if(enchantLevel == replacementEnchant.getMaxLevel()){
                     enchantLevel = enchantLevel - 1;
-                } else if (enchantLevel > eo.getEnchantment().getMaxLevel()){
-                    enchantLevel = eo.getEnchantment().getMaxLevel();
+                } else if (enchantLevel > replacementEnchant.getMaxLevel()){
+                    enchantLevel = replacementEnchant.getMaxLevel();
                 }
 
-                eo.setEnchantmentLevel(enchantLevel);
-                e.getEnchanter().updateInventory();
+                //e.getEnchanter().sendMessage(ChatColor.BLUE + "Prepare Level " + enchantLevel);
+
+
+                        eo.setEnchantment(replacementEnchant);
+                        eo.setEnchantmentLevel(enchantLevel);
+                        e.getEnchanter().updateInventory();
+
+                e.getEnchanter().sendMessage(ChatColor.GREEN + "Prepare Enchants to Add after edit = " + eo.getEnchantment() + " which should equal " + replacementEnchant.getName());
             }
         }
     }
 
-    public Enchantment newChosenEnchantment(ItemStack item, long seed, Enchantment[] eo){
-        Enchantment[] notTable = new Enchantment[]{VANISHING_CURSE,BINDING_CURSE,FROST_WALKER,MENDING,SOUL_SPEED,SWIFT_SNEAK};
-
-        ArrayList<Enchantment> notPossibleFromTable = new ArrayList<>(Arrays.asList(notTable));
-        Random rand = new Random();
-        rand.setSeed(seed);
-
-        int chosen = rand.nextInt(EnchantmentDisablerPlugin.allowedEnchant.size() - 1);
-
-        if(item.getType()== Material.BOOK ||
-                (!notPossibleFromTable.contains(EnchantmentDisablerPlugin.allowedEnchant.get(chosen)) && EnchantmentDisablerPlugin.allowedEnchant.get(chosen).canEnchantItem(item))){
-            return EnchantmentDisablerPlugin.allowedEnchant.get(chosen);
-        }else{
-            return newChosenEnchantment(item, seed+1, eo);
-        }
-    }
 }

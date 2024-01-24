@@ -3,6 +3,7 @@ package me.opd.enchantmentdisabler;
 import me.opd.enchantmentdisabler.commands.MenuCommand;
 import me.opd.enchantmentdisabler.listeners.*;
 import me.opd.enchantmentdisabler.utils.ConfigUtilsEN;
+import me.opd.enchantmentdisabler.utils.EnchantUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.enchantments.Enchantment;
@@ -15,6 +16,7 @@ public final class EnchantmentDisablerPlugin extends JavaPlugin {
 
     public static HashMap<Enchantment, Boolean> blockedEnchants;
     public static ArrayList<Enchantment> allowedEnchant;
+    public static EnchantUtils enchantUtils;
 
     public void onEnable(){
 
@@ -30,6 +32,7 @@ public final class EnchantmentDisablerPlugin extends JavaPlugin {
 
 
         EnchantmentDisablerPlugin.blockedEnchants = new HashMap<Enchantment, Boolean>();
+        EnchantmentDisablerPlugin.enchantUtils = new EnchantUtils();
 
         Bukkit.getServer().getPluginCommand("ed").setExecutor(new MenuCommand(this));
 
