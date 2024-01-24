@@ -1,23 +1,18 @@
 package me.opd.enchantmentdisabler.listeners;
 
 import me.opd.enchantmentdisabler.EnchantmentDisablerPlugin;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class InventoryOpenListener implements Listener {
+public class PlayerConsumeItemListener implements Listener {
+
     @EventHandler
-    public void onPlayerOpenAnInventory(InventoryOpenEvent e){
-
-        if(e.getView().getTitle().equals(ChatColor.GRAY + "" + ChatColor.BOLD + "Select Enchants")){
-            return;
-        }
-
-        for(ItemStack i : e.getInventory().getContents()){
+    public void onPlayerEat(PlayerItemConsumeEvent e){
+        for(ItemStack i : e.getPlayer().getInventory().getContents()){
             if(i==null || i.getType().equals(Material.AIR)){
                 continue;
             }

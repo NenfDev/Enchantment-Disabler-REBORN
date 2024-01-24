@@ -5,7 +5,6 @@ import me.opd.enchantmentdisabler.listeners.*;
 import me.opd.enchantmentdisabler.utils.ConfigUtilsEN;
 import me.opd.enchantmentdisabler.utils.EnchantUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,14 +23,15 @@ public final class EnchantmentDisablerPlugin extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new ItemClickListener(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new EnchantItemListener(), this);
 
-        if(this.getConfig().getBoolean("PurgeExistingDisabledEnchantedItemsToo") == true) {
+        if(this.getConfig().getBoolean("PurgeExistingDisabledEnchantedItemsToo")) {
             Bukkit.getServer().getPluginManager().registerEvents(new InventoryOpenListener(), this);
             Bukkit.getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
             Bukkit.getServer().getPluginManager().registerEvents(new EntityPickupItemListener(), this);
+            Bukkit.getServer().getPluginManager().registerEvents(new PlayerConsumeItemListener(), this);
         }
 
 
-        EnchantmentDisablerPlugin.blockedEnchants = new HashMap<Enchantment, Boolean>();
+        EnchantmentDisablerPlugin.blockedEnchants = new HashMap<>();
         EnchantmentDisablerPlugin.enchantUtils = new EnchantUtils();
 
         Bukkit.getServer().getPluginCommand("ed").setExecutor(new MenuCommand(this));
@@ -41,10 +41,10 @@ public final class EnchantmentDisablerPlugin extends JavaPlugin {
 
         ConfigUtilsEN.loadHashMapFromConfig(this);
         //System.out.println(EnchantmentDisablerPlugin.blockedEnchants.toString());
-        allowedEnchant = new ArrayList<Enchantment>();
+        allowedEnchant = new ArrayList<>();
 
         for(Enchantment en : EnchantmentDisablerPlugin.blockedEnchants.keySet()){
-            if(EnchantmentDisablerPlugin.blockedEnchants.get(en)==false){
+            if(!EnchantmentDisablerPlugin.blockedEnchants.get(en)){
                 EnchantmentDisablerPlugin.allowedEnchant.add(en);
                 //System.out.println("Enchant is allowed: " + en.toString());
             }

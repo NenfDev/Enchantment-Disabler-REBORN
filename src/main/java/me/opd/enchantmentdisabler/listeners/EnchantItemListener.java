@@ -21,16 +21,21 @@ public class EnchantItemListener implements Listener {
     @EventHandler
     public void onItemEnchant(EnchantItemEvent e){
         ArrayList<Enchantment> toChange = new ArrayList<>();
-        long seed = (long) (e.getEnchanter().getLevel() * 3469) + e.getExpLevelCost();
-        Enchantment replacementEnchant = EnchantmentDisablerPlugin.enchantUtils.newChosenEnchantment(e.getItem(), seed);
 
-        //e.getEnchanter().sendMessage("Listener seed " + seed);
-        //e.getEnchanter().sendMessage(String.valueOf(e.getEnchanter().getLevel()));
-        e.getEnchanter().sendMessage(ChatColor.DARK_RED + "Enchants to add " + e.getEnchantsToAdd().keySet());
+        if(!e.getEnchantsToAdd().keySet().contains(e.getEnchantmentHint())){
 
-//        if(!e.getEnchantsToAdd().keySet().contains(e.getEnchantmentHint())){
-//            e.getEnchantsToAdd().put(e.getEnchantmentHint(),((e.getExpLevelCost()/30) * (replacementEnchant.getMaxLevel())));
-//        }
+            int enchantLevel = ((e.getExpLevelCost() /30) * e.getEnchantmentHint().getMaxLevel());
+
+            if(enchantLevel <1 || e.getEnchantmentHint().getMaxLevel() == 1){
+                enchantLevel = 1;
+            }else if(enchantLevel == e.getEnchantmentHint().getMaxLevel()){
+                enchantLevel = enchantLevel - 1;
+            } else if (enchantLevel > e.getEnchantmentHint().getMaxLevel()){
+                enchantLevel = e.getEnchantmentHint().getMaxLevel();
+            }
+
+            e.getEnchantsToAdd().put(e.getEnchantmentHint(),enchantLevel);
+        }
 
         for(Map.Entry<Enchantment, Integer> entry : e.getEnchantsToAdd().entrySet()){
 
@@ -46,21 +51,17 @@ public class EnchantItemListener implements Listener {
 
         for(Enchantment en : toChange){
             e.getEnchantsToAdd().remove(en, e.getEnchantsToAdd().get(en));
-            //e.getEnchanter().sendMessage(ChatColor.RED + "Removed enchantment " + en.getName());
 
-            int enchantLevel = ((e.getExpLevelCost()/30) * (replacementEnchant.getMaxLevel()));
-            //e.getEnchanter().sendMessage(ChatColor.YELLOW + "Hint enchant was " + replacementEnchant.getName() + " with max level " + replacementEnchant.getMaxLevel());
-
-            if(enchantLevel < 1 || replacementEnchant.getMaxLevel() == 1){
-                enchantLevel=1;
-            }else if(enchantLevel == replacementEnchant.getMaxLevel()){
-                enchantLevel = enchantLevel - 1;
-            } else if (enchantLevel > replacementEnchant.getMaxLevel()){
-                enchantLevel = replacementEnchant.getMaxLevel();
-            }
-            //e.getEnchanter().sendMessage(ChatColor.BLUE + "Listener Level " + enchantLevel);
-            //TODO add more specific debug messages that are all encompasing to figure out how to fix when there are more enchants than just removed and/or hint
-            e.getEnchantsToAdd().put(replacementEnchant, enchantLevel);
+//            int enchantLevel = ((e.getExpLevelCost()/30) * (replacementEnchant.getMaxLevel()));
+//
+//            if(enchantLevel < 1 || replacementEnchant.getMaxLevel() == 1){
+//                enchantLevel=1;
+//            }else if(enchantLevel == replacementEnchant.getMaxLevel()){
+//                enchantLevel = enchantLevel - 1;
+//            } else if (enchantLevel > replacementEnchant.getMaxLevel()){
+//                enchantLevel = replacementEnchant.getMaxLevel();
+//            }
+//            e.getEnchantsToAdd().put(replacementEnchant, enchantLevel);
         }
 
         Enchantment conflictedOne = null;
